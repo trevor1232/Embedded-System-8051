@@ -1,0 +1,343 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              05/08/2020 22:37:13 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          //Trevor Scott
+   2          //So this program I did get outsource material to do as far as I did, and about half I was able to code. I
+             - just want to be absoutely try about it. 
+   3          
+   4          //Directives
+   5          #include <reg51.h>
+   6          #include <absacc.h>
+   7          #include <ctype.h> // toUpper
+   8          
+   9          #define uchar unsigned char
+  10          #define uint  unsigned int  
+  11          //ADDRESSES
+  12          uchar START_ADDR[5];  
+  13          uchar END_ADDR[5];
+  14          
+  15          #define CR 0x0D   //Signifies \r "return"
+  16          #define LF 0x0A   //Signifies beginning of line
+  17          
+  18          void Mem_Write(uint i, uint mode);
+  19          uchar rw_in_check(uchar user_menu);
+  20          void read_mem(uchar mem_value, uchar *value_str);
+  21          uint adder_check(uchar user_menu, uint i, uint start);
+  22          void trans_a_char(uchar mychar);
+  23          void update_output(uint i, uchar RW);
+  24          void init_serial();
+  25          void send_1_line(uchar *line_out);
+  26          uchar Receive_Char();
+  27          void receive_1_line(uchar *line_in);
+  28          uint hex_str_to_value(uchar *hex_str);
+  29          
+  30          //Main
+  31          void main(void){
+  32   1        uchar code start_msg[] =
+  33   1        {"This program allows you access different parts of memory areas in the 8051.\n\r\r"};
+  34   1        uchar code menu[] =
+  35   1        {"\n\r\rChoose a memory area to access: \n\r\r1. Internal RAM\n\r\r2. Flash ROM\n\r\r3. Expanded RAM\n\r
+             -"};
+  36   1        //will get the user's choice
+  37   1        uchar user_RW;
+  38   1        uchar user_menu = 0;
+  39   1        uchar reloop = 0;  
+  40   1        uint start_addr, end_addr, i;
+  41   1      
+  42   1        //Memory location is 8-bits thus we only need 2 hex digits,
+  43   1        // to access memory address(s)
+  44   1        uchar mem_hex_val[4];
+  45   1        init_serial();
+  46   1        send_1_line(start_msg);         
+  47   1        while(1){
+  48   2          if(!reloop){
+  49   3            //Outputs the menu
+  50   3            send_1_line(menu);                   
+  51   3            //Receives user's  choice
+  52   3            user_menu  = Receive_Char();         
+C51 COMPILER V9.60.0.0   MAIN                                                              05/08/2020 22:37:13 PAGE 2   
+
+  53   3            //Checks Read write input
+  54   3            user_RW    = rw_in_check(user_menu); 
+  55   3            start_addr = adder_check(user_menu, 0, 0);
+  56   3            end_addr   = adder_check(user_menu, 1, start_addr);
+  57   3          }
+  58   2          //for Read only
+  59   2          else user_RW = 'R';
+  60   2            
+  61   2          //Read or write data from specified memory 
+  62   2          //and send them to serial port for the respected memory access
+  63   2          for(i=start_addr; i<=end_addr; i++){
+  64   3            switch(user_menu){
+  65   4              case '1':
+  66   4                if(toupper(user_RW)=='W') Mem_Write(i, 1);
+  67   4                if(i==end_addr && toupper(user_RW)=='W'){
+  68   5                  update_output(1, 'W');
+  69   5                  reloop = 1;
+  70   5                }
+  71   4                if(i==start_addr && toupper(user_RW)=='R' && !reloop){
+  72   5                  update_output(1, 'R');
+  73   5                }
+  74   4                if(toupper(user_RW)=='R'){
+  75   5                  reloop = 0;
+  76   5                  read_mem(DBYTE[i], mem_hex_val);
+  77   5                }
+  78   4                break;
+  79   4              case '2':
+  80   4                user_RW = 'R';
+  81   4                if(i==start_addr) 
+  82   4                  update_output(2, 'R');
+  83   4                read_mem(CBYTE[i], mem_hex_val);
+  84   4                break;
+  85   4              case '3':
+  86   4                if(toupper(user_RW)=='W') Mem_Write(i, 3);
+  87   4                if(i==end_addr && toupper(user_RW)=='W'){
+  88   5                  update_output(3, 'W');
+  89   5                  reloop = 1;
+  90   5                }
+  91   4                if(i==start_addr && toupper(user_RW)=='R' && !reloop)
+  92   4                  update_output(3, 'R');
+  93   4                if(toupper(user_RW)=='R'){
+  94   5                  reloop = 0;
+  95   5                  read_mem(XBYTE[i], mem_hex_val);
+  96   5                }
+  97   4              default:
+  98   4                break;
+  99   4            }
+ 100   3            if(!reloop && toupper(user_RW) == 'R')
+ 101   3              send_1_line(mem_hex_val);  
+ 102   3          }
+ 103   2          if(!reloop) send_1_line("\n\r\n\r");
+ 104   2        }
+ 105   1      }
+ 106          
+ 107          // This function displays outputs depending on whether the
+ 108          // user read or wrote for the memory they selected
+ 109          void update_output(uint i, uchar RW){
+ 110   1        const uchar *prompt[5];
+ 111   1        prompt[0] = "\n\rThe contents in Internal RAM locations ";
+ 112   1        prompt[1] = "\n\rThe contents in Flash ROM locations ";
+ 113   1        prompt[2] = "\n\rThe contents in Expanded RAM locations ";
+ 114   1        prompt[3] = " - ";
+C51 COMPILER V9.60.0.0   MAIN                                                              05/08/2020 22:37:13 PAGE 3   
+
+ 115   1        prompt[4] = " are updated with: ";
+ 116   1        prompt[5] = " are: ";
+ 117   1          
+ 118   1        if(RW=='R'){
+ 119   2          if(i==1) send_1_line(prompt[0]);
+ 120   2          if(i==2) send_1_line(prompt[1]);
+ 121   2          if(i==3) send_1_line(prompt[2]);
+ 122   2          send_1_line(START_ADDR);
+ 123   2          send_1_line(prompt[3]);
+ 124   2          send_1_line(END_ADDR);
+ 125   2          send_1_line(prompt[5]);
+ 126   2        }
+ 127   1        else{
+ 128   2          if(i==1) send_1_line(prompt[0]);
+ 129   2          if(i==3) send_1_line(prompt[2]);
+ 130   2          send_1_line(START_ADDR);
+ 131   2          send_1_line(prompt[3]);
+ 132   2          send_1_line(END_ADDR);
+ 133   2          send_1_line(prompt[4]);
+ 134   2        }
+ 135   1      }
+ 136          
+ 137          // This function checks the starting and ending address of
+ 138          // what the user inputs
+ 139          uint adder_check(uchar user_menu, uint i, uint start){
+ 140   1        uint range, value;
+ 141   1        uint min=0;
+ 142   1        const uchar *prompt[3];
+ 143   1        prompt[0] = "\n\rEnter a starting address in hex(Ex: 70):";
+ 144   1        prompt[1] = "\rEnter an ending address in hex(Ex: 73):";
+ 145   1        prompt[2] = "\rAddress is invalid. Re-enter";
+ 146   1      
+ 147   1        if(user_menu == '1'){
+ 148   2          range=0xFF; min=0x30;
+ 149   2        }
+ 150   1        else if(user_menu == '2') {
+ 151   2          range=0xFFFF;
+ 152   2        }
+ 153   1        else if(user_menu == '3') {
+ 154   2          range=0x6FF;
+ 155   2        }
+ 156   1        else{
+ 157   2          return 0;
+ 158   2        }
+ 159   1        send_1_line(prompt[i]);
+ 160   1        if(i==0){
+ 161   2          receive_1_line(START_ADDR);
+ 162   2          value=hex_str_to_value(START_ADDR);
+ 163   2        }
+ 164   1        else{
+ 165   2          receive_1_line(END_ADDR);
+ 166   2          value=hex_str_to_value(END_ADDR);
+ 167   2        }
+ 168   1        while((value > range || value < min) || (value < start && i)){
+ 169   2          send_1_line(prompt[2]);
+ 170   2          adder_check(user_menu, i, start);
+ 171   2        }
+ 172   1        return value;
+ 173   1      }
+ 174          
+ 175          // This function checks if the user entered R or W for read or
+ 176          // write option in menu
+C51 COMPILER V9.60.0.0   MAIN                                                              05/08/2020 22:37:13 PAGE 4   
+
+ 177          uchar rw_in_check(uchar user_menu){
+ 178   1        uchar code read_write[] = 
+ 179   1        {"\n\rEnter R for read or W for write)\n\r"};
+ 180   1        uchar code invalid_input[] =
+ 181   1        {"\n\rInvalid choice\n\r"};
+ 182   1        uchar RW;
+ 183   1        
+ 184   1        //This checks if user chose option 1 or 3 and then asks if
+ 185   1        //they want to read or write and checks the input
+ 186   1        if(user_menu == '1' || user_menu == '3'){
+ 187   2          send_1_line(read_write);
+ 188   2          RW = Receive_Char();
+ 189   2          while(toupper(RW) != 'W' && toupper(RW) != 'R'){
+ 190   3            send_1_line(invalid_input);
+ 191   3            rw_in_check(user_menu);
+ 192   3          }
+ 193   2          trans_a_char(RW);
+ 194   2          return RW;
+ 195   2        }
+ 196   1        return 0; //Returns 0 if user chooses option 2
+ 197   1      }
+ 198          
+ 199          // This function transmits a char data member
+ 200          void trans_a_char(uchar mychar){
+ 201   1         SBUF=mychar;
+ 202   1         while (TI==0); // wait until transmitted
+ 203   1         TI=0;
+ 204   1      }
+ 205          
+ 206          // Initial serial port to work with a 9600 baud rate 
+ 207          void init_serial(void){
+ 208   1        TMOD = 0x20;
+ 209   1        TH1  = 0xFD;
+ 210   1        SCON = 0x50;
+ 211   1        TR1  = 1;
+ 212   1      }
+ 213          
+ 214          // This function outputs a line to be displayed for the user
+ 215          void send_1_line(uchar *line_out){
+ 216   1        while(*line_out != 0x00){
+ 217   2          SBUF = *line_out;
+ 218   2          while(!TI);
+ 219   2          TI = 0;
+ 220   2          line_out++;
+ 221   2        }
+ 222   1      }
+ 223          
+ 224          // This function finds out the hex string that represent the
+ 225          // specified memory value. 
+ 226          void read_mem(uchar mem_value, uchar *value_str){
+ 227   1        //Calculate and find the ASCII value for the high hex digit
+ 228   1        value_str[0]=(mem_value&0xF0)>>4;
+ 229   1        value_str[0]=value_str[0]>9?value_str[0]-10+'A':value_str[0]+'0';
+ 230   1      
+ 231   1        //Calculate and find the ASCII value for the low hex digit
+ 232   1        value_str[1]=mem_value&0x0F;
+ 233   1        value_str[1]=value_str[1]>9?value_str[1]-10+'A':value_str[1]+'0';
+ 234   1      
+ 235   1        //Add a space for display format control, and a null terminator for the string
+ 236   1        value_str[2] = ' ';
+ 237   1        value_str[3] = '\0';
+ 238   1      }
+C51 COMPILER V9.60.0.0   MAIN                                                              05/08/2020 22:37:13 PAGE 5   
+
+ 239          
+ 240          //this will write the memory into the internal ram memory
+ 241          void Mem_Write(uint i, uint mode){
+ 242   1        uchar write[5]; 
+ 243   1        uchar code write_prompt[] =
+ 244   1        {"\n\rPlease enter new data in hex:" };
+ 245   1        send_1_line(write_prompt);
+ 246   1        receive_1_line(write);
+ 247   1        if(mode==1) DBYTE[i] = hex_str_to_value(write);
+ 248   1        if(mode==3) XBYTE[i] = hex_str_to_value(write);
+ 249   1      }
+ 250          
+ 251          
+ 252          
+ 253          // This function receives one char to choose a menu choice 
+ 254          uchar Receive_Char(){
+ 255   1        uchar received_char;
+ 256   1        while(!RI);
+ 257   1        received_char = SBUF;
+ 258   1        RI            = 0;
+ 259   1        return received_char;
+ 260   1      }
+ 261          
+ 262          // This function recieves a string of chars
+ 263          void receive_1_line(uchar *line_in){
+ 264   1        uchar received_line;
+ 265   1        do{
+ 266   2          while(!RI);
+ 267   2          received_line = SBUF;
+ 268   2          *line_in      = received_line;
+ 269   2          line_in++;
+ 270   2          RI            = 0;
+ 271   2        }while(received_line != CR); //While not at end line
+ 272   1        
+ 273   1        //Transmits LF char
+ 274   1        SBUF=LF;
+ 275   1        while (!TI); //Wait until transmitted
+ 276   1        TI=0;
+ 277   1        
+ 278   1        //Remove CR and add null terminator to the string
+ 279   1        line_in--;
+ 280   1        *line_in = '\0'; 
+ 281   1      }
+ 282          
+ 283          
+ 284          
+ 285          
+ 286          // This function converts a hex digit string to its
+ 287          // equivalent hex value.
+ 288          uint hex_str_to_value(uchar *hex_str){
+ 289   1        uchar c;
+ 290   1        uint value=0;
+ 291   1        uchar index=0;
+ 292   1        
+ 293   1        //Calculate the hex value
+ 294   1        while (c=toupper(hex_str[index++]))
+ 295   1          if (c>='0' && c<='9')
+ 296   1            value = (value<<4)+(c-'0');
+ 297   1          else if ((c>='A' && c<='F')||(c>='a' && c<='f'))
+ 298   1            value = (value<<4)+(c-'A'+10);
+ 299   1          else 
+ 300   1            return 0; //Wrong hex number
+C51 COMPILER V9.60.0.0   MAIN                                                              05/08/2020 22:37:13 PAGE 6   
+
+ 301   1        return value; //Right hex number
+ 302   1      }
+ 303          
+ 304          
+ 305          
+ 306          
+ 307          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1312    ----
+   CONSTANT SIZE    =    529    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     10      67
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,148 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              04/22/2020 03:15:53 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #define uchar unsigned char
+   3          
+   4          sbit SW1= P0^0; sbit SW2= P0^1;
+   5          //interupter
+   6          sbit SW8= P0^7;
+   7          
+   8          //function prototypes void delay(void);
+   9          void PARTCP1(void); void PARTCP2(void); 
+  10          void main(void) {
+  11   1      ///////For Part A)//////////
+  12   1      /*
+  13   1      unsigned char mynum[] = "ABCDEF"; // RAM Space unsigned char z;
+  14   1      while(1){
+  15   1      for(z=0; z<=6; z++){
+  16   1      P1=mynum[z];
+  17   1      }
+  18   1      }
+  19   1      */
+  20   1      /*
+  21   1      unsigned char mydata[100]; //RAM sapce unsigned char x,z=0; for(x=0;x<100;x++){
+  22   1      z--;
+  23   1      mydata[x]=z; P1=z;
+  24   1      delay();
+  25   1      }
+  26   1       
+  27   1      */
+  28   1      ////////////////////////////
+  29   1      /////Part B)//////////////
+  30   1      
+  31   1      //intel text file below
+  32   1      
+  33   1      /*
+  34   1      unsigned char my_data0[] = {0x08, 0x08, 0x0c, 0x00, 0x75, 0x80, 0xff, 0x85, 0x80, 0x90, 0x80, 0xf8};//size
+             - 12
+  35   1      unsigned char my_data1[] = {0x03,0x00,0x00,0x00,0x02,0x08,0x00};// size 7
+  36   1      unsigned char my_data2[] = {0x0c, 0x08, 0x00, 0x00, 0x78, 0x7f, 0xe4,0xf6, 0xd8, 0xfd, 0x75, 0x81,0x07, 0x
+             -02, 0x08, 0x0c}; //16 size
+  37   1      unsigned char my_data3[] = {0x00, 0x00, 0x00, 0x01}; //size 4
+  38   1      
+  39   1      unsigned char good= 'G'; unsigned char bad='B'; unsigned char x; unsigned char sum = 0;
+  40   1      unsigned char checksumbyte0; unsigned char checksumbyte1; unsigned char checksumbyte2; unsigned char check
+             -sumbyte3;
+  41   1      
+  42   1      unsigned char checkSum0=0xe3; unsigned char checkSum1=0xf3; unsigned char checkSum2=0x33; unsigned char ch
+             -eckSum3=0xff;
+  43   1      P2=~0xc0; P1=~0xc0;
+  44   1      
+  45   1      //1
+  46   1      for(x=0; x<12; x++)
+  47   1      {
+  48   1      sum = sum + my_data0[x]; //add them together
+  49   1      }
+  50   1      
+C51 COMPILER V9.60.0.0   MAIN                                                              04/22/2020 03:15:53 PAGE 2   
+
+  51   1      checksumbyte0 = ~sum +1; // 2's complement
+  52   1      //reset sum sum =0;
+  53   1      
+  54   1      //2
+  55   1      for(x=0; x<7; x++)
+  56   1      {
+  57   1      sum = sum + my_data1[x]; //add them together
+  58   1      }
+  59   1      
+  60   1      checksumbyte1 = ~sum +1; // 2's complement sum=0;
+  61   1       
+  62   1      
+  63   1      //3
+  64   1      for(x=0; x<16; x++)
+  65   1      {
+  66   1      sum = sum + my_data2[x]; //add them together
+  67   1      }
+  68   1      
+  69   1      checksumbyte2 = ~sum +1; // 2's complement sum=0;
+  70   1      
+  71   1      //4
+  72   1      for(x=0; x<4; x++)
+  73   1      {
+  74   1      sum = sum + my_data3[x]; //add them together
+  75   1      }
+  76   1      
+  77   1      checksumbyte3 = ~sum +1; // 2's complement sum=0;
+  78   1      
+  79   1      //if else statement
+  80   1      if(checkSum0 == checksumbyte0 && checkSum1 == checksumbyte1 && checkSum2 == checksumbyte2 && checkSum3 == 
+             -checksumbyte3){
+  81   1      //Segments showing G or B are just a bonus and I put the delay just to see how quick it compiles the DATA.
+  82   1        P1=~0xc0; 
+  83   1        delay(); 
+  84   1        P2=~0x82;
+  85   1        delay(); 
+  86   1        P0=good;
+  87   1      } else {
+  88   1        P1=~0xc0; 
+  89   1        delay(); 
+  90   1        P2=~0x80;
+  91   1        delay(); 
+  92   1        P0=bad;
+  93   1      }
+  94   1      */
+  95   1      //partc
+  96   1      while(1){
+  97   2      if(SW1){
+  98   3      PARTCP1();
+  99   3      } if(SW2){
+ 100   3        PARTCP2();
+ 101   3      } else {
+ 102   3        P1=~0x80; P2=~0x80;
+ 103   3      }
+ 104   2      }
+ 105   1      }
+ 106          void PARTCP@(voidi) {
+*** ERROR C136 IN LINE 106 OF main.c: 'PARTCP': 'void' on variable
+*** ERROR C129 IN LINE 106 OF main.c: missing ';' before '@'
+ 107            unsigned char my_data0[] = {0x08, 0x08, 0x0c, 0x00, 0x75, 0x80, 0xff, 0x85, 0x80, 0x90, 0x80, 0xf8};//siz
+             -e 12
+ 108          unsigned char my_data1[] = {0x03,0x00,0x00,0x00,0x02,0x08,0x00};// size 7
+C51 COMPILER V9.60.0.0   MAIN                                                              04/22/2020 03:15:53 PAGE 3   
+
+ 109          unsigned char my_data2[] = {0x0c, 0x08, 0x00, 0x00, 0x78, 0x7f, 0xe4,0xf6, 0xd8, 0xfd, 0x75, 0x81,0x07, 0x
+             -02, 0x08, 0x0c}; //16 size
+ 110          unsigned char my_data3[] = {0x00, 0x00, 0x00, 0x01}; //size 4
+ 111          
+ 112          unsigned char good= 'G'; unsigned char bad='B'; unsigned char x; unsigned char sum = 0;
+ 113          unsigned char checksumbyte0; unsigned char checksumbyte1; unsigned char checksumbyte2; unsigned char check
+             -sumbyte3;
+ 114          
+ 115          unsigned char checkSum0=0xe3; unsigned char checkSum1=0xf3; unsigned char checkSum2=0x33; unsigned char ch
+             -eckSum3=0xff;
+ 116          P2=~0xc0; P1=~0xc0;
+ 117           
+ 118          
+ 119          
+ 120           
+ 121          
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  2 ERROR(S)
