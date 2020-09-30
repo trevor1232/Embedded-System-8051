@@ -1,0 +1,141 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              02/13/2020 22:55:49 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          void delay(void);
+   3          void main(void)
+   4          {
+   5   1        while(1){
+   6   2          //1st pattern
+   7   2          P1=0x18;// turn on
+   8   2          delay();
+   9   2          P1=0x24;//turn off and have other leds turn on
+  10   2          delay();
+  11   2          P1=0x42;
+  12   2          delay();
+  13   2          P1=0x81;
+  14   2          delay();
+  15   2          P1=0x42;
+  16   2          delay();
+  17   2          P1=0x24;
+  18   2          delay();
+  19   2          P1=0x18;// turn on
+  20   2          delay();
+  21   2          P1=0x24;//turn off and have other leds turn on
+  22   2          delay();
+  23   2          P1=0x42;
+  24   2          delay();
+  25   2          P1=0x81;
+  26   2          delay();
+  27   2          P1=0x42;
+  28   2          delay();
+  29   2          P1=0x24;
+  30   2          delay();
+  31   2          P1=0x18;
+  32   2          delay();
+  33   2          P1=0x00;
+  34   2          //2nd pattern
+  35   2          delay();
+  36   2          P1=0x01;
+  37   2          delay();
+  38   2          P1=0x02;
+  39   2          delay();
+  40   2          P1=0x04;
+  41   2          delay();
+  42   2          P1=0x08;
+  43   2          delay();
+  44   2          P1=0x10;
+  45   2          delay();
+  46   2          P1=0x20;
+  47   2          delay();
+  48   2          P1=0x40;
+  49   2          delay();
+  50   2          P1=0x80;
+  51   2          delay();
+  52   2          P1=0x40;
+  53   2          delay();
+  54   2          P1=0x20;
+C51 COMPILER V9.60.0.0   MAIN                                                              02/13/2020 22:55:49 PAGE 2   
+
+  55   2          delay();
+  56   2          P1=0x10;
+  57   2          delay();
+  58   2          P1=0x08;
+  59   2          delay();
+  60   2          P1=0x04;
+  61   2          delay();
+  62   2          P1=0x02;
+  63   2          delay();
+  64   2          P1=0x01;
+  65   2          delay();
+  66   2          P1=0x02;
+  67   2          delay();
+  68   2          P1=0x04;
+  69   2          delay();
+  70   2          P1=0x08;
+  71   2          delay();
+  72   2          P1=0x10;
+  73   2          delay();
+  74   2          P1=0x20;
+  75   2          delay();
+  76   2          P1=0x40;
+  77   2          delay();
+  78   2          P1=0x80;
+  79   2          delay();
+  80   2          P1=0x40;
+  81   2          delay();
+  82   2          P1=0x20;
+  83   2          delay();
+  84   2          P1=0x10;
+  85   2          delay();
+  86   2          P1=0x08;
+  87   2          delay();
+  88   2          P1=0x04;
+  89   2          delay();
+  90   2          P1=0x02;
+  91   2          delay();
+  92   2          P1=0x01;
+  93   2          delay();
+  94   2          //my pattern below
+  95   2          P1=0x80;
+  96   2          delay();
+  97   2          P1=0x01;
+  98   2          delay();
+  99   2          P1=0x80;
+ 100   2          delay();
+ 101   2          P1=0x01;
+ 102   2          delay();
+ 103   2      
+ 104   2      
+ 105   2        }
+ 106   1      }
+ 107          void delay(void)
+ 108          {
+ 109   1        int go = 0;
+ 110   1        int i, j;
+ 111   1        for(i =0; i<0xff; i++)
+ 112   1          for(j =0; j<0xff; j++);
+ 113   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+C51 COMPILER V9.60.0.0   MAIN                                                              02/13/2020 22:55:49 PAGE 3   
+
+   CODE SIZE        =    313    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,113 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              02/21/2020 10:09:52 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          void delay(void);
+   3          void firstRound(void);
+   4          void secondRound(void);
+   5          void myPattern(void);
+   6          void main(void)
+   7          {
+   8   1        while(1){
+   9   2          firstRound();
+  10   2          secondRound();
+  11   2          myPattern();
+  12   2        }
+  13   1      
+  14   1      }
+  15          
+  16          void firstRound(){
+  17   1        unsigned char next0 = 0x42&0x42;
+  18   1        unsigned char next1 = 0x80;
+  19   1        unsigned char next2 = 0x01;
+  20   1        int i =0;
+  21   1        for(i =0; i <2; i++){
+  22   2        P1=0x18&0x18;
+  23   2        delay();
+  24   2        P1=0x20|0x04;
+  25   2        delay();
+  26   2        P1= next0;
+  27   2        delay();
+  28   2        P1=0xFF^0x7E;
+  29   2        delay();
+  30   2        P1= (next1>>1 | next2<<1);
+  31   2        delay();
+  32   2        P1= (next1>>2 | next2<<2);
+  33   2        delay();
+  34   2        if( i ==1){
+  35   3          P1=0x18&0x18;
+  36   3          delay();
+  37   3          }
+  38   2        }
+  39   1      }
+  40          void secondRound(){
+  41   1        unsigned char repeat0 = 0x01;
+  42   1        unsigned char repeat1 = 0x80;
+  43   1        int g=0;
+  44   1        int i =0;
+  45   1        int j=0;
+  46   1        for(g=0;g<2;g++){
+  47   2          for(i =0; i <6; i++){
+  48   3              if(i == 0){
+  49   4                P1=0x01;
+  50   4                delay();
+  51   4              }
+  52   3              P1= repeat0 <<i+1;
+  53   3              delay();
+  54   3          }
+C51 COMPILER V9.60.0.0   MAIN                                                              02/21/2020 10:09:52 PAGE 2   
+
+  55   2          for(j=0;j<6; j++){
+  56   3            if(j==0){
+  57   4              P1=0x80;
+  58   4              delay();
+  59   4            }
+  60   3            P1=repeat1>>j+1;
+  61   3            delay();
+  62   3          }
+  63   2        }
+  64   1        P1=0x01^0x00;
+  65   1        delay();
+  66   1      }
+  67          
+  68          void myPattern(){
+  69   1        unsigned char repeat0 = 0x7f;
+  70   1        unsigned char repeat1 = 0xfe;
+  71   1        int i =0;
+  72   1        for(i=0;i<2;i++){
+  73   2          P1=~repeat0;
+  74   2          delay();
+  75   2          P1=~repeat1;
+  76   2          delay();
+  77   2        }
+  78   1      }
+  79          
+  80          
+  81          void delay(void)
+  82          {
+  83   1        int go = 0;
+  84   1        int i, j;
+  85   1        for(i =0; i<0xff; i++)
+  86   1          for(j =0; j<0xff; j++);
+  87   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    364    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      19
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
